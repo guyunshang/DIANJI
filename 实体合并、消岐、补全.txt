@@ -1,0 +1,4 @@
+补全：
+graph_writer.py中的convert_to_graph_document函数，注释elif schema_rule and schema_rule.get("source"):到else:continue之前；以及elif schema_rule and schema_rule.get("target"):到else:continue之前；
+合并与消岐：
+build/build_index_and_community.py中build_index_and_communities(self)函数注释掉2.3.4点，同时第二点中duplicates = [] # 设为空列表，防止后续逻辑报错

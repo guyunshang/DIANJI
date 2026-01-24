@@ -1,0 +1,36 @@
+缓存清除：
+构建知识图谱的缓存取决于build.py的运行文件夹，所以要清除两个文件夹，1是主文件夹的cache，2是build.py所在子文件夹的cache
+无效文档：
+可以解除注释graph_writer.py中的convert_to_graph_document函数中的调试打印代码
+
+
+缓存功能的关闭：
+1、缓存文件的写入
+在 graphrag_agent/agents/base.py 中，修改 __init__ 方法的默认参数:
+def __init__(self, cache_dir="./cache", memory_only=False):
+将False改为 True即可
+同时将env和settings文件的CACHE_MEMORY_ONLY修改为 True
+
+2、跳过缓存检查逻辑（目前没有修改此项）
+在 graphrag_agent/agents/base.py 中，通过修改 ask 和 ask_stream 方法，跳过缓存检查逻辑：
+将调用 self._check_all_caches 或 self.global_cache_manager.get 的代码块注释掉。
+
+3、build下的main.py后增加了运行之后手动删除cache文件夹内容的程序
+def process_all(self):
+    # 步骤 1: 构建图谱
+    # 步骤 2: 构建索引
+    # ... 原有流程执行完后 ...
+
+    # 新增：自动清理构建过程中产生的临时缓存
+    if os.path.exists(CACHE_DIR):
+        try:
+            shutil.rmtree(CACHE_DIR)
+            self.console.print(f"[green]已成功清理构建缓存目录: {CACHE_DIR}[/green]")
+        except Exception as e:
+            self.console.print(f"[yellow]清理缓存失败: {e}[/yellow]")
+
+    # 另外建议：如果您希望下次也是“纯净”构建，还可以删除增量记录文件
+    registry_path = "file_registry.json"
+    if os.path.exists(registry_path):
+        os.remove(registry_path)
+
